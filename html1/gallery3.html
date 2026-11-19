@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Aina's Gallery | Photo Collection</title>
+	<link rel="stylesheet" href="style1.css">
+	<link rel="icon" type="image/png" href="aina.png">
+<style>
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    /* Photo Wall Grid */
+    .photo-wall {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .gallery-item {
+        position: relative;
+        background-color: #ffffff;
+        border: 1px solid #F8BBD0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(244, 143, 177, 0.15);
+        cursor: pointer;
+        aspect-ratio: 1 / 1;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+
+    .gallery-item:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 20px rgba(216, 27, 96, 0.22);
+        border-color: #F48FB1;
+    }
+
+    .gallery-item:hover img {
+        transform: scale(1.08);
+    }
+
+    .hover-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(173, 20, 87, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-size: 1.8rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .gallery-item:hover .hover-overlay {
+        opacity: 1;
+    }
+
+    /* FIX: Fullscreen Lightbox Modal (Covers all footers & content) */
+    .lightbox-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 9999; /* Higher than header and footer */
+        background-color: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(8px);
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .lightbox-modal.active {
+        display: flex;
+    }
+
+    /* FIX: Centered Viewport for Main Image */
+    .lightbox-viewport {
+        position: relative;
+        max-width: 80vw;
+        max-height: 75vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .lightbox-img {
+        max-width: 100%;
+        max-height: 75vh;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        transition: transform 0.2s ease-out;
+    }
+
+    /* FIX: Close Button Pinned Top-Right */
+    .lightbox-close-btn {
+        position: absolute;
+        top: 20px;
+        right: 25px;
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10001;
+        transition: all 0.2s ease;
+    }
+
+    .lightbox-close-btn:hover {
+        background: #D81B60;
+        border-color: #D81B60;
+    }
+
+    /* FIX: Navigation Arrows Pinned Left & Right */
+    .lightbox-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        z-index: 10001;
+    }
+
+    .lightbox-arrow:hover {
+        background: #D81B60;
+        border-color: #D81B60;
+    }
+
+    .arrow-prev { left: 25px; }
+    .arrow-next { right: 25px; }
+
+    /* FIX: Floating Bottom Zoom Controls */
+    .zoom-toolbar {
+        position: absolute;
+        bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 8px 20px;
+        border-radius: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: #ffffff;
+        font-weight: 600;
+        z-index: 10001;
+    }
+
+    .ctrl-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .ctrl-btn:hover {
+        background: #D81B60;
+    }
+</style>
+</head>
+<body>
+
+<!--Header-->
+<header>
+	<nav id="desktop-nav">
+	<div class="logo">
+	<img src="aina.jpg" alt="Aina Afiqah" class="logo-img">
+	<span>Aina Afiqah</span></div>
+	<div><div>
+		<audio controls autoplay>
+		<source src="margaret.ogg" type="audio/ogg">
+  		<source src="margaret.mp3" type="audio/mpeg">
+		Your browser does not support the audio element.
+	</audio></div>
+
+	     <ul class="nav-links">
+		<li><a href="index3.html">Home</a></li>
+		<li><a href="background3.html">About Aina</a></li>
+		<li><a href="achievements3.html">Achievements</a></li>
+		<li><a href="contact3.html">Contact</a></li>
+		<li><a href="gallery3.html" class="active">Gallery</a></li>
+		<li><a href="favorite3.html">Favorites</a></li>
+	     </ul>
+	</div>
+	</nav>
+</header>
+
+<!--Main Content-->
+<main class="container">
+	<div class="page-navigation">
+    	<a href="contact3.html" class="nav-btn">← Back</a>
+    	<a href="index3.html" class="nav-btn nav-btn-home">Home</a>
+    	<a href="favorite3.html" class="nav-btn">Next →</a>
+</div>
+
+	<section class="page-intro-box" style="text-align:center;">
+		<h1> Aina's Photo Gallery</h1>
+		<p> A collection of Aina's cherished moments, from when she was a little kid to her recent campus life.</p></section>
+		
+	<div class="photo-wall id="galleryGrid">
+
+		<div class="gallery-item" onclick="openLightbox(0)">	
+		<img src="ainakecil.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(1)">	
+		<img src="ainakecil1.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(2)">	
+		<img src="ainakecil2.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(3)">	
+		<img src="ainakecil3.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(4)">	
+		<img src="ainamrsm1.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(5)">	
+		<img src="ainamrsm2.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(6)">	
+		<img src="ainamrsm3.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(7)">	
+		<img src="ainamrsm4.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(8)">	
+		<img src="ainamrsm5.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(9)">	
+		<img src="ainamrsm6.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(10)">	
+		<img src="ainamrsm7.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(11)">	
+		<img src="ainamrsm8.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(12)">	
+		<img src="ainamrsm9.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(13)">	
+		<img src="ainamrsm10.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(14)">	
+		<img src="ainamrsm11.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(15)">	
+		<img src="ainamrsm12.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(16)">	
+		<img src="ainamrsm13.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(17)">	
+		<img src="ainamrsm14.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(18)">	
+		<img src="ainamrsm15.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(19)">	
+		<img src="ainamrsm16.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(20)">	
+		<img src="ainamrsm17.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(21)">	
+		<img src="ainamrsm18.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(22)">	
+		<img src="ainamrsm19.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(23)">	
+		<img src="ainamrsm20.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(24)">	
+		<img src="ainamrsm21.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(25)">	
+		<img src="ainamrsm22.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(26)">	
+		<img src="ainamrsm23.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(27)">	
+		<img src="ainamrsm24.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(28)">	
+		<img src="ainauoc1.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(29)">	
+		<img src="ainauoc2.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(30)">	
+		<img src="ainauoc3.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(31)">	
+		<img src="ainauoc4.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(32)">	
+		<img src="ainauoc5.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(33)">	
+		<img src="ainauoc6.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(34)">	
+		<img src="ainauoc7.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(35)">	
+		<img src="ainauoc8.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(36)">	
+		<img src="ainauoc9.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(37)">	
+		<img src="ainauoc10.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(38)">	
+		<img src="ainauoc11.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(39)">	
+		<img src="ainauoc12.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(40)">	
+		<img src="ainauoc13.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(41)">	
+		<img src="ainauoc14.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(42)">	
+		<img src="ainauoc15.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(43)">	
+		<img src="ainauoc16.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(44)">	
+		<img src="ainauoc17.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(45)">	
+		<img src="ainauoc18.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(46)">	
+		<img src="ainauoc19.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(47)">	
+		<img src="ainauoc20.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(48)">	
+		<img src="ainauoc21.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(49)">	
+		<img src="ainauoc22.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(50)">	
+		<img src="ainauoc23.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(51)">	
+		<img src="ainauoc24.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(52)">	
+		<img src="ainauoc25.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(53)">	
+		<img src="ainauoc26.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(54)">	
+		<img src="ainauoc27.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(55)">	
+		<img src="ainauoc28.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(56)">	
+		<img src="ainauoc29.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(57)">	
+		<img src="ainauoc30.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(58)">	
+		<img src="ainauoc31.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+		<div class="gallery-item" onclick="openLightbox(59)">	
+		<img src="ainauoc32.jpg" alt="Aina's Photo" onerror="this.src='https://via.placeholder.com/400x400/FCE4EC/AD1457?text=Aina's+Photo';">
+		<div class="hover-overlay"></div></div>
+
+</div>
+</main>
+
+<div class="lightbox-modal" id="lightbox">
+	<div class="lightbox-controls">
+		<button class="ctrl-btn" onclick="closeLightbox()" title"Close (Esc)">X</button>
+	<button class="lightbox-arrow arrow-prev" onclick="changeImage(-1)" title="Previous Image">❮</button>
+
+	<div class="lightbox-viewport">
+		<img src="" alt="Zoomed Photo" id="lightboxImg" class="lightbox-img"></div>
+	<button class="lightbox-arrow arrow-next" onclick="changeImage(1)" title="Next Image">❯</button>
+
+	<div class="zoom-toolbar">
+		<button class="ctrl-btn" onclick="zoomImage(-0.2)" title="Zoom Out">-</button>
+		<span id="zoomLevel">100%</span>
+		<button class="ctrl-btn" onclick="zoomImage(0.2)" title="Zoom In">+</button>
+		<button class="ctrl-btn" onclick="resetZoom()" title="Reset Zoom">|</button></div></div></div>
+
+<!--Footer-->
+<footer>
+	<p>&copy; 2026 Designed by Nur Balqis. All rights reserved.</p>
+	<p><b> The website is developed to fulfill the requirement of IMD318.</b></p>
+</footer>
+
+<!-- Interactive Gallery Lightbox Script -->
+<script>
+    let currentIndex = 0;
+    let currentZoom = 1;
+    const galleryItems = document.querySelectorAll('.gallery-item img');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const zoomLevelDisplay = document.getElementById('zoomLevel');
+
+    function openLightbox(index) {
+        currentIndex = index;
+        lightboxImg.src = galleryItems[currentIndex].src;
+        lightbox.classList.add('active');
+        resetZoom();
+        document.body.style.overflow = 'hidden'; // Prevents background scroll
+    }
+
+    function closeLightbox() {
+        lightbox.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    function changeImage(direction) {
+        currentIndex = (currentIndex + direction + galleryItems.length) % galleryItems.length;
+        lightboxImg.src = galleryItems[currentIndex].src;
+        resetZoom();
+    }
+
+    function zoomImage(amount) {
+        currentZoom = Math.min(Math.max(0.6, currentZoom + amount), 3);
+        updateZoomTransform();
+    }
+
+    function resetZoom() {
+        currentZoom = 1;
+        updateZoomTransform();
+    }
+
+    function updateZoomTransform() {
+        lightboxImg.style.transform = `scale(${currentZoom})`;
+        zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+    }
+
+    // Keyboard Shortcuts (Arrow keys & Escape)
+    document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('active')) return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowRight') changeImage(1);
+        if (e.key === 'ArrowLeft') changeImage(-1);
+        if (e.key === '+' || e.key === '=') zoomImage(0.2);
+        if (e.key === '-') zoomImage(-0.2);
+    });
+
+    // Close lightbox when clicking dark backdrop
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox || e.target.classList.contains('lightbox-viewport')) {
+            closeLightbox();
+        }
+    });
+</script>
+
+<script src="script.js"></script>
+
+</body>
+</html>
