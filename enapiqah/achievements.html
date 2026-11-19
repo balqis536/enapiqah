@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aina's Achievements | Curricular & Co-Curricular</title>
+    <link rel="stylesheet" href="style1.css">
+	<link rel="icon" type="image/png" href="aina.png">
+
+<style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        .section-box {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            width: 100%;
+        }
+        .section-box h2 {
+            color: #0f172a;
+            border-bottom: 2px solid #4f46e5;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .achievement-card {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .achievement-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .achievement-card h3 {
+            color: #1e293b;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .year-tag {
+            display: inline-block;
+            background-color: #4f46e5;
+            color: #ffffff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.2rem 0.60rem;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            width: fit-content;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+
+<!--Header-->
+<header>
+	<nav id="desktop-nav">
+	<div class="logo">
+	<img src="aina.jpg" alt="Aina Afiqah" class="logo-img">
+	<span>Aina Afiqah</span></div>
+	<div><div>
+		<audio controls autoplay>
+		<source src="margaret.ogg" type="audio/ogg">
+  		<source src="margaret.mp3" type="audio/mpeg">
+		Your browser does not support the audio element.
+	</audio></div>
+
+	     <ul class="nav-links">
+		<li><a href="index.html">Home</a></li>
+		<li><a href="background.html">About Aina</a></li>
+		<li><a href="achievements.html" class="active">Achievements</a></li>
+		<li><a href="contact.html">Contact</a></li>
+		<li><a href="gallery.html">Gallery</a></li>
+		<li><a href="favorite.html">Favorites</a></li>
+	     </ul>
+	</div>
+	</nav>
+</header>
+<!--Main Content-->
+<main class="container">
+
+<!-- Bottom Navigation -->
+<div class="page-navigation">
+	<a href="background.html" class="nav-btn">← Back</a>
+	<a href="index.html" class="nav-btn nav-btn-home">Home</a>
+	<a href="contact.html" class="nav-btn">Next →</a>
+</div>
+
+	<!--Header-->
+	<section style="text-align: center; margin-bottom: 2rem;">
+		<h1>Honors & Achievements</h1>
+		<p>Let's take a look at some of Aina's academic awards, leadership, and co-curricular accomplishments.</p>
+	</section>
+
+	<!--Curriculum Achievements Grid-->
+	<div class="section-box">
+		<h2>Aina's Curriculum Achievements</h2>
+		<div class="grid-3">
+
+		<div class="achievement-card">
+	<div>
+		<span class="year-tag">2024 - Present</span>
+		<h3> YTP-Development Scholarship</h3>
+		<p style="font-size: 1.0rem; color: #64748b;">Aina has received a scholarship to further her studies from foundation to Bachelor's degree at the University of Cyberjaya.</p>
+</div></div>
+
+		<div class="achievement-card">
+	<div>
+		<span class="year-tag">2024</span>
+		<h3> Achieved 8As in Sijil Peperiksaan Malaysia (SPM)</h3>
+		<p style="font-size: 1.0rem; color: #64748b;">Aina is one of the excellent graduates of MRSM Semporna after she achieved 8As in her SPM results.</p>
+</div></div>
+
+		<div class="achievement-card">
+	<div>
+		<span class="year-tag">2021-2024</span>
+		<h3> Awarded the Principal's Honor Award</h3>
+		<p style="font-size: 1.0rem; color: #64748b;">Throughout her high school, Aina has successfully maintained her academic performance, for which she has received the award from Form 1 until Form 5.</p>
+</div></div>
+
+		<div class="achievement-card">
+	<div>
+		<span class="year-tag">2019</span>
+		<h3> Achieved 5As in Ujian Peperiksaan Sekolah Rendah</h3>
+		<p style="font-size: 1.0rem; color: #64748b;">Aina has proven her academic excellence during primary school after she got 5As in UPSR.</p>
+</div></div>
+
+		<div class="achievement-card">
+	<div>
+		<span class="year-tag">2019</span>
+		<h3> Achieved 8As in Ujian Penilaian Kelas KAFA</h3>
+		<p style="font-size: 1.0rem; color: #64748b;">Aina also maintained her excellent performance in religious subjects and successfully achieved 8As in the UPKK.</p>
+</div></div></div></div>
+
+<!--Co-Curriculum Achievements Grid-->
+	<div class="section-box">
+		<h2>Aina's Co-Curriculum Achievements</h2>
+		<div class="grid-3">
+
+		<div class="achievement-card">
+	<div>
+		<span class="year-tag">2021 - 2024</span>
+		<h3> Member of Badan Wakil Pelajar (BWP)</h3>
+		<p style="font-size: 1.0rem; color: #64748b;">Aina was assigned as a member of Badan Wakil Pelajar (BWP) from Form 2 until Form 5 as Princess' Exco.</p>
+</div></div>
+
+		<div class="achievement-card">
+	<div>
+		<span class="year-tag">2021-2024</span>
+		<h3> Member of Badan Dakwah & Rohani (BADAR)</h3>
+		<p style="font-size: 1.0rem; color: #64748b;">Aina was assigned as a member of Badan Dakwah & Rohani during her initial enrollment at MRSM.</p>
+</div></div>
+
+		<div class="achievement-card">
+	<div>
+		<span class="year-tag">2023-2024</span>
+		<h3> MRSM SMP's Netball Athlete</h3>
+		<p style="font-size: 1.0rem; color: #64748b;">Aina also participated in Netball tournament Inter-MRSM Level.</p>
+</div></div>
+
+		<div class="achievement-card">
+	<div>
+		<span class="year-tag">2023</span>
+		<h3> Mentor for Programme of Tuition  Pintar YPM</h3>
+		<p style="font-size: 1.0rem; color: #64748b;">Aina also appointed as one of the mentor for a programme organized by the Yayasan Pelajaran MARA, which is Programme of Tuition Pintar.</p>
+</div></div>
+
+		<div class="achievement-card">
+	<div>
+		<span class="year-tag">2022-2023</span>
+		<h3> MRSM SMP's Chess Player</h3>
+		<p style="font-size: 1.0rem; color: #64748b;">Aina has participated in Chess tournament at school level.</p>
+</div></div></div></div>
+
+<!--Accomplishment Summary-->
+<div class="section-box">
+	<h2>Accomplishment Summary</h2>
+	<p style="color: #64748; margin-bottom: 0.5rem;">Throughout her academic journey, Aina has consistently shown excellence in both curricular and co-curricular activities. She has actively participated in various programmes and initiatives while constantly maintaining her academic performance. This reflects her commitment to personal growth and continuous learning.</p>
+</div>
+</main>
+
+<!--Footer-->
+<footer>
+	<p>&copy; 2026 Designed by Nur Balqis. All rights reserved.</p>
+	<p><b> The website is developed to fulfill the requirement of IMD318.</b></p>
+</footer>
+<script src="script.js">
+</script>
+</body>
+</html>
